@@ -403,9 +403,9 @@ button { font: inherit; }
 .block-light .todo { color: #6B6B67; }
 .pills { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .pills li { min-height: 40px; display: inline-flex; align-items: center; padding: 0 16px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 15px; }
-.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 16px; }
-.shots > * { aspect-ratio: 4 / 3; border-radius: 16px; overflow: hidden; }
-.shots img { width: 100%; height: 100%; object-fit: cover; }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 16px; }
+.shots > * { aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; }
+.shots img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .next { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; padding-top: 32px; border-top: 1px solid var(--line); text-decoration: none; }
 .next > span:first-child { display: flex; flex-direction: column; gap: 8px; }
 .next small { font-family: var(--f-display); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
