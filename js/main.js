@@ -207,7 +207,12 @@
         '<div class="slide-inner">' +
           '<video src="' + esc(w.video) + '" loop playsinline preload="none"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : '') + '></video>' +
           '<span class="slide-play" aria-hidden="true">' + PLAY_BIG + '</span>' +
+          '<span class="slide-skip" aria-hidden="true"></span>' +
           '<div class="slide-cap"><strong>' + esc(w.title) + '</strong><small>' + esc(w.meta) + '</small></div>' +
+          '<div class="slide-bar">' +
+            '<input class="slide-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="Position dans la vidéo">' +
+            '<span class="slide-time">0:00 / 0:00</span>' +
+          '</div>' +
         '</div></section>';
     }).join('');
     box.classList.toggle('is-single', vids.length < 2);
@@ -217,13 +222,68 @@
     var opener = null;
     var pushed = false;
 
+    function fmt(t) {
+      t = Math.max(0, Math.floor(t || 0));
+      return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+    }
+
+    // Recule ou avance de quelques secondes, avec un repère visuel
+    function skip(s, v, sec) {
+      if (!isFinite(v.duration)) return;
+      v.currentTime = Math.max(0, Math.min(v.duration - 0.1, v.currentTime + sec));
+      var mark = $('.slide-skip', s);
+      mark.textContent = (sec < 0 ? '−' : '+') + Math.abs(sec) + ' s';
+      mark.className = 'slide-skip is-on ' + (sec < 0 ? 'is-left' : 'is-right');
+      clearTimeout(mark._t);
+      mark._t = setTimeout(function () { mark.classList.remove('is-on'); }, 500);
+    }
+
     slides.forEach(function (s) {
       var v = $('video', s);
+      var seek = $('.slide-seek', s);
+      var time = $('.slide-time', s);
+      var dragging = false;
+
       v.addEventListener('play', function () { s.classList.remove('is-paused'); });
       v.addEventListener('pause', function () { s.classList.add('is-paused'); });
-      // Appui sur la vidéo : pause / lecture
-      $('.slide-inner', s).addEventListener('click', function () {
-        if (v.paused) v.play().catch(function () {}); else v.pause();
+
+      // Barre de progression : suit la lecture, et on peut la faire glisser pour revenir en arrière
+      function sync() {
+        if (!dragging && isFinite(v.duration) && v.duration > 0) {
+          seek.value = Math.round(v.currentTime / v.duration * 1000);
+        }
+        seek.style.setProperty('--p', (seek.value / 10) + '%');
+        time.textContent = fmt(v.currentTime) + ' / ' + fmt(v.duration);
+      }
+      ['timeupdate', 'loadedmetadata', 'seeked'].forEach(function (ev) { v.addEventListener(ev, sync); });
+      seek.addEventListener('input', function () {
+        dragging = true;
+        if (isFinite(v.duration)) v.currentTime = seek.value / 1000 * v.duration;
+        sync();
+      });
+      seek.addEventListener('change', function () { dragging = false; });
+      // Un geste sur la barre ne doit pas mettre la vidéo en pause
+      ['click', 'pointerdown', 'touchstart'].forEach(function (ev) {
+        $('.slide-bar', s).addEventListener(ev, function (e) { e.stopPropagation(); }, { passive: true });
+      });
+
+      // Appui simple : pause / lecture. Double appui à gauche ou à droite : -5 s / +5 s
+      var tapTimer = null;
+      var lastTap = 0;
+      $('.slide-inner', s).addEventListener('click', function (e) {
+        var now = Date.now();
+        var r = this.getBoundingClientRect();
+        var left = (e.clientX - r.left) < r.width / 2;
+        if (now - lastTap < 300) {
+          clearTimeout(tapTimer);
+          lastTap = 0;
+          skip(s, v, left ? -5 : 5);
+          return;
+        }
+        lastTap = now;
+        tapTimer = setTimeout(function () {
+          if (v.paused) v.play().catch(function () {}); else v.pause();
+        }, 300);
       });
     });
 
@@ -292,6 +352,15 @@
       if (e.key === 'Escape') requestClose();
       else if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); go(1); }
       else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+      else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !(e.target.classList && e.target.classList.contains('slide-seek'))) {
+        e.preventDefault();
+        skip(slides[current], $('video', slides[current]), e.key === 'ArrowLeft' ? -5 : 5);
+      }
+      else if (e.key === ' ' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        var cv = $('video', slides[current]);
+        if (cv.paused) cv.play().catch(function () {}); else cv.pause();
+      }
     });
   }
 

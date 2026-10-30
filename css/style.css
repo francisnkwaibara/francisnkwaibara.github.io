@@ -353,8 +353,33 @@ button { font: inherit; }
   color: #FFFFFFE6; opacity: 0; transition: opacity .2s; pointer-events: none;
 }
 .slide.is-paused .slide-play { opacity: 1; }
+/* Barre de progression : on la fait glisser pour revenir en arrière */
+.slide-bar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 20px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.slide-seek {
+  --p: 0%;
+  flex: 1; height: 28px; margin: 0; background: transparent; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.slide-seek::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(to right, var(--accent) var(--p), #FFFFFF4D var(--p)); }
+.slide-seek::-moz-range-track { height: 4px; border-radius: 4px; background: #FFFFFF4D; }
+.slide-seek::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--accent); }
+.slide-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%; background: #FFF; border: 0; }
+.slide-seek::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #FFF; border: 0; }
+.slide-seek:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.slide-time { font-size: 12px; font-variant-numeric: tabular-nums; color: #FFFFFFCC; white-space: nowrap; }
+.slide-skip {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; padding: 10px 16px; border-radius: 999px;
+  background: #000000A6; font-family: var(--f-display); font-size: 18px; letter-spacing: .04em;
+  opacity: 0; transition: opacity .2s; pointer-events: none;
+}
+.slide-skip.is-left { left: 20px; }
+.slide-skip.is-right { right: 20px; }
+.slide-skip.is-on { opacity: 1; }
 .slide-cap {
-  position: absolute; left: 0; right: 0; bottom: 0; padding: 48px 20px 28px;
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 48px 20px 64px;
   background: linear-gradient(transparent, #000000B3); display: flex; flex-direction: column; gap: 4px; pointer-events: none;
 }
 .slide-cap strong { font-family: var(--f-display); font-weight: 600; font-size: 20px; text-transform: uppercase; letter-spacing: .02em; }
