@@ -41,7 +41,7 @@ window.NIF = {
       role: '',
       tools: '',
       year: '',
-      cover: '', video: '', shots: [], url: ''
+      cover: 'assets/projets/thinkyp.jpg', video: '', shots: [], url: 'https://thinkyp.com'
     },
     {
       slug: 'le-barman-vous-recrute',
@@ -56,7 +56,7 @@ window.NIF = {
       role: '',
       tools: '',
       year: '',
-      cover: '', video: '', shots: [], url: ''
+      cover: 'assets/projets/le-barman-vous-recrute.jpg', video: '', shots: [], url: 'https://lebarmanvousrecrute.com'
     },
     {
       slug: 'audiojob',
@@ -71,7 +71,7 @@ window.NIF = {
       role: '',
       tools: '',
       year: '',
-      cover: '', video: '', shots: [], url: ''
+      cover: 'assets/projets/audiojob.jpg', video: '', shots: [], url: 'https://audiojob.fr'
     },
     {
       slug: 'afrique-et-diaspora',
@@ -86,7 +86,7 @@ window.NIF = {
       role: '',
       tools: '',
       year: '',
-      cover: '', video: '', shots: [], url: ''
+      cover: 'assets/projets/afrique-et-diaspora.jpg', video: '', shots: [], url: 'https://afriqueetdiaspora.com'
     },
     {
       slug: 'lycee-francais-charlemagne',
@@ -101,7 +101,7 @@ window.NIF = {
       role: '',
       tools: '',
       year: '',
-      cover: '', video: '', shots: [], url: ''
+      cover: 'assets/projets/lycee-francais-charlemagne.jpg', video: '', shots: [], url: 'https://www.lycee-charlemagne-pnr.com'
     },
     {
       slug: 'congo-services',
@@ -116,7 +116,7 @@ window.NIF = {
       role: '',
       tools: '',
       year: '',
-      cover: '', video: '', shots: [], url: ''
+      cover: 'assets/projets/congo-services.jpg', video: '', shots: [], url: 'https://www.congo-services.com'
     },
     {
       slug: 'diaspora-batisseurs',
@@ -131,23 +131,7 @@ window.NIF = {
       role: '',
       tools: '',
       year: '',
-      cover: '', video: '', shots: [], url: ''
-    },
-    {
-      slug: 'passdrive',
-      name: 'Passdrive',
-      mono: 'PD',
-      cats: ['Applications', 'Outils de gestion'],
-      desc: 'Recherche de moniteurs d’auto-école, rendez-vous, tableaux de bord admin, moniteurs, élèves.',
-      sector: 'Auto-école',
-      problem: '',
-      solution: 'Une application pour trouver un moniteur d’auto-école et réserver ses leçons, avec un espace dédié à chaque profil.',
-      features: ['Recherche de moniteurs', 'Prise de rendez-vous', 'Tableau de bord administration', 'Tableau de bord moniteurs', 'Tableau de bord élèves'],
-      role: '',
-      tools: '',
-      year: '',
-      cover: '', video: '', shots: [], url: '',
-      off: true
+      cover: 'assets/projets/diaspora-batisseurs.jpg', video: '', shots: [], url: 'https://diasporabatisseurs.com'
     }
   ],
 

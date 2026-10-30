@@ -227,8 +227,10 @@
         <div class="socials"></div>
         <p class="lead" style="font-size: 14px">Basé à Pointe-Noire, disponible à distance.</p>
       </div>
-      <form class="form" data-reveal novalidate>
+      <form class="form" name="contact" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal novalidate>
         <p>Laissez vos coordonnées, je vous réponds sous 24 h.</p>
+        <input type="hidden" name="form-name" value="contact">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web" tabindex="-1" autocomplete="off"></label></p>
         <div class="field">
           <label for="c-nom">Nom</label>
           <input id="c-nom" name="nom" type="text" autocomplete="name" required>

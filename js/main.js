@@ -44,7 +44,7 @@
       '<a class="card" href="projet.html?p=' + encodeURIComponent(p.slug) + '" data-cats="' + esc(p.cats.join('|')) + '" data-cursor="view">' +
         '<div class="card-media">' + media +
           '<span class="tag tag-cat">' + esc(p.cats[0]) + '</span>' +
-          (p.off ? '<span class="tag tag-off">Plus en ligne</span>' : '') +
+          (p.off ? '<span class="tag tag-off">Plus en ligne</span>' : p.url ? '<span class="tag tag-live">En ligne</span>' : '') +
         '</div>' +
         '<div class="card-title"><strong>' + esc(p.name) + '</strong><span>' + pad(i + 1) + '</span></div>' +
         '<p>' + esc(p.desc) + '</p>' +
@@ -154,10 +154,20 @@
       box.hidden = !links.length;
     }
 
-    // Formulaire : ouvre la messagerie avec le message prérempli (pas de serveur nécessaire)
+    // Formulaire : envoi via Netlify Forms quand le site est hébergé chez Netlify,
+    // sinon (GitHub Pages, fichier local) ouverture de la messagerie avec le message prérempli
     var form = $('.form');
     if (!form) return;
     var note = $('.form-note', form);
+    var btn = $('button[type="submit"]', form);
+
+    function openMail(nom, email, msg) {
+      var subject = 'Contact portfolio : ' + nom;
+      var body = msg + '\n\n' + nom + '\n' + email;
+      window.location.href = 'mailto:' + mail + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      note.textContent = 'Votre messagerie va s’ouvrir avec le message prêt à envoyer.';
+    }
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var nom = form.nom.value.trim();
@@ -173,10 +183,21 @@
         form.email.focus();
         return;
       }
-      var subject = 'Contact portfolio : ' + nom;
-      var body = msg + '\n\n' + nom + '\n' + email;
-      window.location.href = 'mailto:' + mail + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      note.textContent = 'Votre messagerie va s’ouvrir avec le message prêt à envoyer.';
+      if (location.protocol === 'file:' || !window.fetch) { openMail(nom, email, msg); return; }
+
+      btn.disabled = true;
+      note.textContent = 'Envoi en cours…';
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(form)).toString()
+      }).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        form.reset();
+        note.textContent = 'Merci, votre message est bien envoyé. Je vous réponds sous 24 h.';
+      }).catch(function () {
+        openMail(nom, email, msg);
+      }).then(function () { btn.disabled = false; });
     });
   }
 
@@ -198,6 +219,12 @@
     $('.p-title').innerHTML = '<span class="big">' + esc(words.join(' ')) + '</span>' + (last ? '<span class="serif">' + esc(last) + '</span>' : '');
     $('.p-eyebrow').textContent = 'Projet ' + pad(idx + 1) + ' / ' + p.cats.join(', ');
     $('.p-desc').textContent = p.desc;
+
+    var cta = $('.p-cta');
+    if (p.url && !p.off) {
+      cta.href = p.url;
+      cta.hidden = false;
+    }
 
     var meta = [
       ['Client', p.name],
