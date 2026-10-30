@@ -15,6 +15,10 @@
   var ARROW = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   var PLAY = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg>';
 
+  var SOUND_OFF = '<svg class="i-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+  var SOUND_ON = '<svg class="i-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  var PLAY_BIG = '<svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }
   function $$(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
   function esc(s) {
@@ -111,12 +115,19 @@
 
     var g = $('.gallery');
     if (g) {
+      var vids = D.gallery.filter(function (w) { return w.video; });
+      var vi = 0;
       var items = D.gallery.map(function (w) {
         var has = w.poster || w.video;
         var media = '';
-        // preload="none" : rien n'est téléchargé tant que la vidéo n'est pas lancée
-        if (w.video) media += '<video src="' + esc(w.video) + '" muted loop playsinline controls preload="none"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : '') + ' aria-label="' + esc(w.title) + '"></video>';
-        else if (w.poster) media += '<img src="' + esc(w.poster) + '" alt="" loading="lazy" decoding="async">';
+        if (w.video) {
+          // preload="none" : rien n'est téléchargé tant que la vidéo n'est pas lancée
+          media += '<video src="' + esc(w.video) + '" muted loop playsinline preload="none"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : '') + ' aria-hidden="true" tabindex="-1"></video>' +
+            '<button class="work-hit" type="button" data-cursor="view" data-index="' + (vi++) + '" aria-label="Regarder en plein écran : ' + esc(w.title) + '"></button>' +
+            '<button class="work-sound" type="button" aria-label="Activer ou couper le son">' + SOUND_OFF + SOUND_ON + '</button>';
+        } else if (w.poster) {
+          media += '<img src="' + esc(w.poster) + '" alt="" loading="lazy" decoding="async">';
+        }
         return '<figure class="work' + (has ? ' has-media' : '') + '" data-reveal>' + (has ? '' : PLAY) + media +
           '<figcaption>' + esc(w.title) + '<small>' + esc(w.meta) + '</small></figcaption></figure>';
       });
@@ -126,18 +137,162 @@
       }
       g.innerHTML = items.join('');
 
-      // Les vidéos ne jouent que lorsqu'elles sont visibles, et pas sur mobile (économie de data)
-      if (finePointer && 'IntersectionObserver' in window) {
-        var vo = new IntersectionObserver(function (entries) {
-          entries.forEach(function (en) {
-            var v = en.target;
-            if (en.isIntersecting) v.play().catch(function () {});
-            else v.pause();
-          });
-        }, { threshold: 0.4 });
-        $$('.work video', g).forEach(function (v) { vo.observe(v); });
-      }
+      initGalleryVideos(g);
+      initViewer(vids, g);
     }
+  }
+
+  // Les navigateurs n'autorisent le son qu'après une première interaction (clic, touche)
+  var activated = false;
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function (ev) {
+    document.addEventListener(ev, function () { activated = true; }, { capture: true, passive: true, once: true });
+  });
+  function canPlaySound() {
+    return activated || !!(navigator.userActivation && navigator.userActivation.hasBeenActive);
+  }
+
+  // Lance une vidéo avec le son si possible, sinon sans le son
+  function playWithSound(v, wantSound) {
+    v.muted = !wantSound;
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { v.muted = true; v.play().catch(function () {}); });
+  }
+
+  function initGalleryVideos(g) {
+    var saveData = !!(navigator.connection && navigator.connection.saveData);
+    var cards = $$('.work.has-media', g).filter(function (c) { return $('video', c); });
+
+    cards.forEach(function (card) {
+      var v = $('video', card);
+      function refresh() {
+        card.classList.toggle('is-playing', !v.paused);
+        card.classList.toggle('is-muted', v.muted);
+      }
+      ['play', 'pause', 'volumechange'].forEach(function (ev) { v.addEventListener(ev, refresh); });
+
+      $('.work-sound', card).addEventListener('click', function () {
+        v.muted = !v.muted;
+        if (v.paused) v.play().catch(function () {});
+      });
+
+      // Ordinateur : lecture au survol, avec le son dès que le navigateur l'autorise
+      if (finePointer) {
+        card.addEventListener('mouseenter', function () { playWithSound(v, canPlaySound()); });
+        card.addEventListener('mouseleave', function () { v.pause(); });
+      }
+    });
+
+    // Mobile : lecture sans le son quand la vidéo arrive à l'écran (sauf économiseur de données)
+    if (!finePointer && !saveData && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          var v = $('video', en.target);
+          if (en.isIntersecting) { v.muted = true; v.play().catch(function () {}); }
+          else v.pause();
+        });
+      }, { threshold: 0.6 });
+      cards.forEach(function (c) { io.observe(c); });
+    }
+  }
+
+  // Lecteur plein écran : une vidéo par écran, défilement vertical comme TikTok
+  function initViewer(vids, g) {
+    var box = $('#viewer');
+    if (!box || !vids.length) return;
+    var track = $('.viewer-track', box);
+    var count = $('.viewer-count', box);
+
+    track.innerHTML = vids.map(function (w, i) {
+      return '<section class="slide" data-i="' + i + '" aria-label="Vidéo ' + (i + 1) + ' sur ' + vids.length + '">' +
+        '<div class="slide-inner">' +
+          '<video src="' + esc(w.video) + '" loop playsinline preload="none"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : '') + '></video>' +
+          '<span class="slide-play" aria-hidden="true">' + PLAY_BIG + '</span>' +
+          '<div class="slide-cap"><strong>' + esc(w.title) + '</strong><small>' + esc(w.meta) + '</small></div>' +
+        '</div></section>';
+    }).join('');
+    box.classList.toggle('is-single', vids.length < 2);
+
+    var slides = $$('.slide', track);
+    var current = 0;
+    var opener = null;
+    var pushed = false;
+
+    slides.forEach(function (s) {
+      var v = $('video', s);
+      v.addEventListener('play', function () { s.classList.remove('is-paused'); });
+      v.addEventListener('pause', function () { s.classList.add('is-paused'); });
+      // Appui sur la vidéo : pause / lecture
+      $('.slide-inner', s).addEventListener('click', function () {
+        if (v.paused) v.play().catch(function () {}); else v.pause();
+      });
+    });
+
+    function show(i) {
+      current = i;
+      count.textContent = (i + 1) + ' / ' + vids.length;
+      slides.forEach(function (s, j) {
+        var v = $('video', s);
+        if (j === i) playWithSound(v, true);
+        else v.pause();
+      });
+    }
+
+    // La vidéo qui occupe l'écran est celle qui joue (swipe, molette ou flèches)
+    var settle;
+    track.addEventListener('scroll', function () {
+      clearTimeout(settle);
+      settle = setTimeout(function () {
+        if (box.hidden) return;
+        var i = Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollTop / track.clientHeight)));
+        if (i !== current) show(i);
+      }, 120);
+    }, { passive: true });
+
+    function open(i, from) {
+      opener = from;
+      $$('.work video', g).forEach(function (v) { v.pause(); });
+      box.hidden = false;
+      root.classList.add('viewer-open');
+      track.scrollTop = slides[i].offsetTop;
+      show(i);
+      // Le bouton retour du téléphone ou du navigateur ferme le lecteur
+      history.pushState({ nifViewer: true }, '');
+      pushed = true;
+      $('.viewer-close', box).focus();
+    }
+
+    function close() {
+      if (box.hidden) return;
+      slides.forEach(function (s) { $('video', s).pause(); });
+      box.hidden = true;
+      root.classList.remove('viewer-open');
+      if (opener) opener.focus();
+    }
+
+    function requestClose() {
+      if (pushed) { pushed = false; history.back(); } else close();
+    }
+
+    function go(d) {
+      var n = Math.max(0, Math.min(slides.length - 1, current + d));
+      track.scrollTo({ top: slides[n].offsetTop, behavior: reduced ? 'auto' : 'smooth' });
+      if (n !== current) show(n);
+    }
+
+    window.addEventListener('popstate', function () { pushed = false; close(); });
+    g.addEventListener('click', function (e) {
+      var b = e.target.closest('.work-hit');
+      if (b) open(+b.getAttribute('data-index'), b);
+    });
+    $('.viewer-close', box).addEventListener('click', requestClose);
+    $('.viewer-prev', box).addEventListener('click', function () { go(-1); });
+    $('.viewer-next', box).addEventListener('click', function () { go(1); });
+    document.addEventListener('keydown', function (e) {
+      if (box.hidden) return;
+      if (e.key === 'Escape') requestClose();
+      else if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); go(1); }
+      else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+    });
   }
 
   function renderContact() {

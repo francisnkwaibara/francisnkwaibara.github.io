@@ -323,6 +323,53 @@ button { font: inherit; }
 /* Légende en haut pour laisser les commandes de la vidéo libres en bas */
 .work.has-media figcaption { background: linear-gradient(#000000B3, transparent); margin: -20px -20px auto; padding: 20px 20px 40px; pointer-events: none; }
 .work-next { background: transparent; color: #4A4A47; border: 1.5px dashed #0B0B0B66; }
+.work-hit { position: absolute; inset: 0; z-index: 2; width: 100%; background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: inherit; }
+.work-sound {
+  position: absolute; right: 12px; bottom: 12px; z-index: 3; width: 44px; height: 44px; border-radius: 50%;
+  border: 0; background: #000000A6; color: #FFF; display: none; align-items: center; justify-content: center; cursor: pointer;
+}
+.work.is-playing .work-sound { display: flex; }
+.work-sound .i-on, .work.is-muted .work-sound .i-off { display: block; }
+.work-sound .i-off, .work.is-muted .work-sound .i-on { display: none; }
+
+/* --- Lecteur vidéo plein écran ---------------------------------------------- */
+
+.viewer { position: fixed; inset: 0; z-index: 80; background: #000; color: #FFF; }
+.viewer-open { overflow: hidden; }
+.viewer-track {
+  height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.viewer-track::-webkit-scrollbar { display: none; }
+.slide {
+  height: 100vh; height: 100dvh; scroll-snap-align: start; scroll-snap-stop: always;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Le cadre garde toujours le format vertical de la vidéo, bandes noires autour si besoin */
+.slide-inner { position: relative; height: 100%; max-width: 100%; aspect-ratio: 9 / 16; cursor: pointer; }
+.slide-inner video { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.slide-play {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #FFFFFFE6; opacity: 0; transition: opacity .2s; pointer-events: none;
+}
+.slide.is-paused .slide-play { opacity: 1; }
+.slide-cap {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 48px 20px 28px;
+  background: linear-gradient(transparent, #000000B3); display: flex; flex-direction: column; gap: 4px; pointer-events: none;
+}
+.slide-cap strong { font-family: var(--f-display); font-weight: 600; font-size: 20px; text-transform: uppercase; letter-spacing: .02em; }
+.slide-cap small { font-size: 14px; color: #FFFFFFB3; }
+.viewer-count { position: absolute; top: 24px; left: 20px; font-family: var(--f-display); font-size: 14px; letter-spacing: .1em; }
+.viewer-close, .viewer-nav button {
+  width: 48px; height: 48px; border-radius: 50%; border: 0; cursor: pointer;
+  background: #FFFFFF26; color: #FFF; display: flex; align-items: center; justify-content: center;
+  transition: background-color .2s;
+}
+.viewer-close:hover, .viewer-nav button:hover { background: #FFFFFF4D; }
+.viewer-close { position: absolute; top: 14px; right: 14px; }
+.viewer-nav { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; }
+.viewer.is-single .viewer-nav, .viewer.is-single .viewer-count { display: none; }
+@media (hover: none), (pointer: coarse) { .viewer-nav { display: none; } }
 
 /* Outils */
 .tools { display: flex; flex-wrap: wrap; gap: clamp(32px, 4vw, 64px); }
@@ -423,7 +470,7 @@ button { font: inherit; }
 .cursor { display: none; }
 @media (hover: hover) and (pointer: fine) {
   .cursor {
-    display: flex; position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none;
+    display: flex; position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none;
     width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--paper);
     mix-blend-mode: difference; align-items: center; justify-content: center;
     transition: width .35s var(--ease), height .35s var(--ease), margin .35s var(--ease), opacity .3s;
