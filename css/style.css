@@ -323,6 +323,9 @@ button { font: inherit; }
 /* Légende en haut pour laisser les commandes de la vidéo libres en bas */
 .work.has-media figcaption { background: linear-gradient(#000000B3, transparent); margin: -20px -20px auto; padding: 20px 20px 40px; pointer-events: none; }
 .work-next { background: transparent; color: #4A4A47; border: 1.5px dashed #0B0B0B66; }
+/* Vidéo horizontale : carte deux fois plus large, même hauteur que les autres */
+.work.is-landscape { grid-column: span 2; aspect-ratio: auto; min-height: 240px; }
+.slide.is-landscape .slide-inner { aspect-ratio: 16 / 9; height: auto; width: min(100vw, calc(100dvh * 16 / 9)); }
 .work-hit { position: absolute; inset: 0; z-index: 2; width: 100%; background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: inherit; }
 .work-sound {
   position: absolute; right: 12px; bottom: 12px; z-index: 3; width: 44px; height: 44px; border-radius: 50%;

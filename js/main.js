@@ -128,11 +128,12 @@
         } else if (w.poster) {
           media += '<img src="' + esc(w.poster) + '" alt="" loading="lazy" decoding="async">';
         }
-        return '<figure class="work' + (has ? ' has-media' : '') + '" data-reveal>' + (has ? '' : PLAY) + media +
+        return '<figure class="work' + (has ? ' has-media' : '') + (w.format === 'paysage' ? ' is-landscape' : '') + '" data-reveal>' + (has ? '' : PLAY) + media +
           '<figcaption>' + esc(w.title) + '<small>' + esc(w.meta) + '</small></figcaption></figure>';
       });
-      // Emplacements « à venir » pour compléter la grille à 5
-      for (var i = items.length; i < 5; i++) {
+      // Emplacements « à venir » pour compléter la grille à 5 places (une vidéo horizontale en prend 2)
+      var used = D.gallery.reduce(function (n, w) { return n + (w.format === 'paysage' ? 2 : 1); }, 0);
+      for (var i = used; i < 5; i++) {
         items.push('<figure class="work work-next" data-reveal>' + PLAY + '<figcaption>Prochain travail, à venir</figcaption></figure>');
       }
       g.innerHTML = items.join('');
@@ -203,7 +204,7 @@
     var count = $('.viewer-count', box);
 
     track.innerHTML = vids.map(function (w, i) {
-      return '<section class="slide" data-i="' + i + '" aria-label="Vidéo ' + (i + 1) + ' sur ' + vids.length + '">' +
+      return '<section class="slide' + (w.format === 'paysage' ? ' is-landscape' : '') + '" data-i="' + i + '" aria-label="Vidéo ' + (i + 1) + ' sur ' + vids.length + '">' +
         '<div class="slide-inner">' +
           '<video src="' + esc(w.video) + '" loop playsinline preload="none"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : '') + '></video>' +
           '<span class="slide-play" aria-hidden="true">' + PLAY_BIG + '</span>' +

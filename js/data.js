@@ -161,7 +161,8 @@ window.NIF = {
   ],
 
   /* --- Galerie motion design -----------------------------------------------
-     Format vertical (9:16), comme les Reels et TikTok.
+     Format vertical (9:16) par défaut, comme les Reels et TikTok.
+     format : 'paysage' pour une vidéo horizontale (16:9)
      poster : image fixe affichée avant la lecture (obligatoire)
      video  : mp4 léger (720p, < 3 Mo), lancé seulement quand la carte est visible
      Les emplacements « à venir » se complètent automatiquement. */
@@ -171,6 +172,13 @@ window.NIF = {
       meta: 'Concept personnel · Oct. 2026',
       poster: 'assets/motion/myairtel-transfert.jpg',
       video: 'assets/motion/myairtel-transfert.mp4'
+    },
+    {
+      title: 'LTE Africa · L’eau, l’énergie et l’agriculture',
+      meta: 'Commande client',
+      poster: 'assets/motion/lte-africa.jpg',
+      video: 'assets/motion/lte-africa.mp4',
+      format: 'paysage'
     }
   ]
 };
