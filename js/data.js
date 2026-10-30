@@ -161,11 +161,16 @@ window.NIF = {
   ],
 
   /* --- Galerie motion design -----------------------------------------------
-     poster : image fixe (obligatoire pour la légèreté sur mobile)
-     video  : mp4 léger, joué seulement quand la carte est visible */
+     Format vertical (9:16), comme les Reels et TikTok.
+     poster : image fixe affichée avant la lecture (obligatoire)
+     video  : mp4 léger (720p, < 3 Mo), lancé seulement quand la carte est visible
+     Les emplacements « à venir » se complètent automatiquement. */
   gallery: [
-    { title: '[Travail 01]', meta: '[Outil · date]', poster: '', video: '' },
-    { title: '[Travail 02]', meta: '[Outil · date]', poster: '', video: '' },
-    { title: '[Travail 03]', meta: '[Outil · date]', poster: '', video: '' }
+    {
+      title: 'MyAirtel App · Envoyer de l’argent',
+      meta: 'Concept personnel · Oct. 2026',
+      poster: 'assets/motion/myairtel-transfert.jpg',
+      video: 'assets/motion/myairtel-transfert.mp4'
+    }
   ]
 };

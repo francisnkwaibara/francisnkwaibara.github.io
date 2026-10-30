@@ -114,13 +114,14 @@
       var items = D.gallery.map(function (w) {
         var has = w.poster || w.video;
         var media = '';
-        if (w.poster) media += '<img src="' + esc(w.poster) + '" alt="" loading="lazy" decoding="async">';
-        if (w.video) media += '<video muted loop playsinline preload="none" data-src="' + esc(w.video) + '"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : '') + '></video>';
+        // preload="none" : rien n'est téléchargé tant que la vidéo n'est pas lancée
+        if (w.video) media += '<video src="' + esc(w.video) + '" muted loop playsinline controls preload="none"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : '') + ' aria-label="' + esc(w.title) + '"></video>';
+        else if (w.poster) media += '<img src="' + esc(w.poster) + '" alt="" loading="lazy" decoding="async">';
         return '<figure class="work' + (has ? ' has-media' : '') + '" data-reveal>' + (has ? '' : PLAY) + media +
           '<figcaption>' + esc(w.title) + '<small>' + esc(w.meta) + '</small></figcaption></figure>';
       });
-      // Emplacements « à venir » pour compléter la grille à 6
-      for (var i = items.length; i < 6; i++) {
+      // Emplacements « à venir » pour compléter la grille à 5
+      for (var i = items.length; i < 5; i++) {
         items.push('<figure class="work work-next" data-reveal>' + PLAY + '<figcaption>Prochain travail, à venir</figcaption></figure>');
       }
       g.innerHTML = items.join('');
@@ -130,10 +131,8 @@
         var vo = new IntersectionObserver(function (entries) {
           entries.forEach(function (en) {
             var v = en.target;
-            if (en.isIntersecting) {
-              if (!v.src) v.src = v.getAttribute('data-src');
-              v.play().catch(function () {});
-            } else v.pause();
+            if (en.isIntersecting) v.play().catch(function () {});
+            else v.pause();
           });
         }, { threshold: 0.4 });
         $$('.work video', g).forEach(function (v) { vo.observe(v); });
