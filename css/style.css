@@ -262,6 +262,15 @@ button { font: inherit; }
 .filter:hover { border-color: var(--paper); }
 .filter[aria-pressed="true"] { background: var(--paper); color: var(--ink); border-color: var(--paper); }
 .filter sup { font-size: 10px; margin-left: 4px; color: inherit; opacity: .6; }
+/* Mobile : les filtres restent sur une seule ligne, qu'on fait défiler à l'horizontale */
+@media (max-width: 600px) {
+  .filters {
+    width: calc(100% + var(--gutter)); margin-right: calc(-1 * var(--gutter)); padding-right: var(--gutter);
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter { flex-shrink: 0; white-space: nowrap; }
+}
 
 .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: clamp(28px, 3vw, 40px) 24px; }
 .card { display: flex; flex-direction: column; gap: 16px; text-decoration: none; transition: opacity .4s var(--ease), transform .5s var(--ease); }
@@ -311,7 +320,12 @@ button { font: inherit; }
 .timeline p { margin: 0; font-size: 15px; color: var(--muted-dark); }
 
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(42%, 220px), 1fr)); gap: 16px; }
-@media (max-width: 600px) { .gallery .work:nth-child(n+5) { display: none; } }
+/* Mobile : une vidéo par ligne, et un seul emplacement « à venir » */
+@media (max-width: 600px) {
+  .gallery { grid-template-columns: 1fr; }
+  .gallery .work-next ~ .work-next { display: none; }
+  .gallery .work-next { aspect-ratio: 16 / 9; }
+}
 .work {
   position: relative; margin: 0; aspect-ratio: 9 / 16; border-radius: 16px; overflow: hidden;
   display: flex; flex-direction: column; justify-content: space-between; padding: 20px;
@@ -325,6 +339,7 @@ button { font: inherit; }
 .work-next { background: transparent; color: #4A4A47; border: 1.5px dashed #0B0B0B66; }
 /* Vidéo horizontale : carte deux fois plus large, même hauteur que les autres */
 .work.is-landscape { grid-column: span 2; aspect-ratio: auto; min-height: 240px; }
+@media (max-width: 600px) { .work.is-landscape { grid-column: auto; aspect-ratio: 16 / 9; min-height: 0; } }
 .slide.is-landscape .slide-inner { aspect-ratio: 16 / 9; height: auto; width: min(100vw, calc(100dvh * 16 / 9)); }
 .work-hit { position: absolute; inset: 0; z-index: 2; width: 100%; background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: inherit; }
 .work-sound {
