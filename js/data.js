@@ -30,6 +30,23 @@ window.NIF = {
      url    : lien vers le projet en ligne, si public */
   projects: [
     {
+      slug: 'noumbi-resort',
+      name: 'Noumbi Resort',
+      mono: 'NR',
+      cats: ['Web'],
+      desc: 'Refonte du site d’un éco-lodge et spot de surf au Congo, avec une page par bungalow et la réservation sur WhatsApp.',
+      sector: 'Tourisme, hôtellerie',
+      problem: 'L’ancien site, construit sur Bubble, présentait les bungalows dans une simple liste, avec des textes provisoires. Pour un lieu situé à 3 à 4 h de route de Pointe-Noire, les visiteurs ont besoin de voir les lieux, de comprendre comment venir et de réserver facilement depuis leur téléphone.',
+      solution: 'Un site pensé d’abord pour le mobile, qui raconte « une journée à Noumbi », du matin au coucher du soleil. Chaque bungalow a sa page avec une galerie photo, son couchage et ses tarifs, et la réservation se fait en un clic sur WhatsApp avec un message prérempli.',
+      features: ['Fond qui évolue au fil de la journée', 'Filtre des bungalows par capacité', 'Page détail par bungalow', 'Galeries à swiper et photos en plein écran', 'Réservation WhatsApp préremplie', 'Itinéraire d’accès étape par étape', 'Site rapide, sans bibliothèque'],
+      role: 'Refonte de bout en bout : conception, design, développement et mise en ligne.',
+      tools: 'HTML, CSS, JavaScript · Claude Code',
+      year: '2026',
+      cover: 'assets/projets/noumbi-resort.jpg', video: '',
+      shots: ['assets/projets/noumbi-resort-2.jpg', 'assets/projets/noumbi-resort-3.jpg', 'assets/projets/noumbi-resort-4.jpg'],
+      url: 'https://francisnkwaibara.github.io/noumbi-resort/'
+    },
+    {
       slug: 'thinkyp',
       name: 'Thinkyp',
       mono: 'TK',

@@ -22,6 +22,10 @@ Tout se fait dans **`js/data.js`** :
 
 Les textes fixes (accroche, à propos, services) sont dans `index.html`.
 
+## Après chaque modification
+
+Changer le numéro `?v=` des liens `css/style.css`, `js/data.js` et `js/main.js` dans `index.html` et `projet.html` (ex. `?v=20261031` → `?v=20261101`). Sinon les téléphones peuvent garder l'ancienne version en cache.
+
 ## Images et vidéos : rester léger
 
 - Images en `.jpg` ou `.webp`, 1600 px de large maximum, moins de 300 Ko
